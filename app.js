@@ -63,26 +63,50 @@ class UI {
     });
   }
 
-  static updateBook(id, book) {
+  static updateBook(name, book) {
     return new Promise((res, rej) => {
-      books = books.filter((book) => book.name !== id);
-      let rows = document.querySelectorAll("th");
-      Array.from(rows).map((row) => {
-        let rid = row.dataset.id;
-        if (rid === id) {
-          row.parentElement.remove();
-          UI.createBook(book);
-        }
-      });
       try {
-        books = [...books, book];
+        books = this.change(name);
+        UI.createBook(book);
         res(books);
       } catch (error) {
         rej("Error: couldn't update this book");
       }
     });
   }
+
+  static removeBook(name) {
+    return new Promise((resolve, reject) => {
+      try {
+        books = this.change(name);
+        resolve(books);
+      } catch (error) {
+        reject("Couldn't remove a book;");
+      }
+    });
+  }
+
+  static change(name) {
+    books = books.filter((book) => book.name !== name);
+    let rows = document.querySelectorAll("th");
+    Array.from(rows).map((row) => {
+      let rid = row.dataset.id;
+      if (rid === name) {
+        row.parentElement.remove();
+      }
+    });
+    return books;
+  }
 }
+
+const remove = (name) => {
+  if (!confirm(`are you sure you wanna delete: ${name}?`)) {
+    return;
+  }
+  UI.removeBook(name)
+    .then((books) => Storage.updateBooks(books))
+    .catch((err) => console.log(err));
+};
 
 const edit = (name) => {
   const book = books.find((book) => book.name === name);
