@@ -2,6 +2,7 @@ const creationForm = document.getElementById("create-form");
 const bookName = document.getElementById("book-name");
 const bookAuther = document.getElementById("book-auther");
 const bookList = document.getElementById("book-list");
+const searchInput = document.getElementById("search-input");
 let mode = "create";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -16,6 +17,37 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch((error) => {
           console.log(error);
         });
+    });
+  }
+});
+
+document.getElementById("search-form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  let rows = document.querySelectorAll("th");
+  let rowsArr = Array.from(rows);
+  if (searchInput.value !== "") {
+    const matches = books
+      .filter((book) => book.name.match(searchInput.value))
+      .map((match) => match.name.trim());
+    if (!matches.length) {
+      alert(`couldn't find ${searchInput.value}`);
+    } else {
+      rowsArr.map((row) => {
+        let rid = row.dataset.id;
+        if (rid !== undefined) {
+          const displayStyle = matches.includes(rid.trim())
+            ? "table-row"
+            : "none";
+          row.parentElement.style.display = displayStyle;
+        }
+      });
+    }
+  } else {
+    rowsArr.map((row) => {
+      let rid = row.dataset.id;
+      if (rid !== undefined) {
+        row.parentElement.style.display = "table-row";
+      }
     });
   }
 });
